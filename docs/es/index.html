@@ -16,7 +16,7 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mona Mayhem Workshop</title>
+    <title>Taller Mona Mayhem</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="alternate" hreflang="en" href="https://copilot-dev-days.github.io/mona-mayhem/">
@@ -29,7 +29,7 @@
 </head>
 <body>
     <div class="top-controls">
-        <div class="track-toggle" role="tablist" aria-label="Alternar pista del taller">
+        <div class="track-toggle" role="tablist" aria-label="Alternar modalidad del taller">
             <button class="track-btn active" data-track="vscode" type="button">VS Code</button>
             <button class="track-btn" data-track="cli" type="button">CLI</button>
         </div>
@@ -47,16 +47,16 @@
 
     <section class="hero">
         <div class="container">
-            <div class="hero-badge" id="heroBadge">🎮 VS Code GitHub Copilot Workshop</div>
-            <h1>Mona Mayhem Workshop</h1>
+            <div class="hero-badge" id="heroBadge">🎮 Taller de GitHub Copilot para VS Code</div>
+            <h1>Taller Mona Mayhem</h1>
             <p class="hero-subtitle" id="heroSubtitle">Construye una arena de batalla de contribuciones GitHub con estilo retro arcade mientras dominas las funciones de VS Code Copilot: ingeniería de contexto, Plan Mode, Agent Mode, desarrollo design-first y flujos de trabajo multi-agent.</p>
             <div class="track-panel">
-                <p class="track-panel-title">Elige tu superficie Copilot</p>
+                <p class="track-panel-title">Elige cómo usar Copilot</p>
                 <p class="track-panel-copy" id="trackCopy">Usa el taller VS Code para practicar Chat, Plan Mode, Agent Mode, agentes en segundo plano y el ciclo de revisión en el editor.</p>
                 <div class="track-highlights" id="trackHighlights"></div>
             </div>
             <div class="hero-cta">
-                <a href="step.html?step=00-overview&amp;track=vscode" class="btn btn-primary" id="startWorkshopBtn">🚀 Iniciar Taller VS Code</a>
+                <a href="step.html?step=00-overview&amp;track=vscode" class="btn btn-primary" id="startWorkshopBtn">🚀 Empezar el taller de VS Code</a>
                 <a href="https://github.com/copilot-dev-days/mona-mayhem" class="btn btn-secondary" target="_blank">⭐ Repositorio GitHub</a>
             </div>
             <p class="hero-note">El alternador actualiza cada paso del taller para que la documentación se ajuste al flujo elegido.</p>
@@ -194,7 +194,7 @@
         const tracks = {
             vscode: {
                 label: 'VS Code',
-                badge: '🎮 VS Code GitHub Copilot Workshop',
+                badge: '🎮 Taller de GitHub Copilot para VS Code',
                 subtitle: 'Construye una arena de batalla de contribuciones GitHub con estilo retro arcade mientras dominas las funciones de VS Code Copilot: ingeniería de contexto, Plan Mode, Agent Mode, desarrollo design-first y flujos de trabajo multi-agent.',
                 copy: 'Usa el taller VS Code para practicar Chat, Plan Mode, Agent Mode, agentes en segundo plano y el ciclo de revisión en el editor.',
                 highlights: ['Chat panel', 'Plan Mode', 'Agent Mode', 'Background agents'],
@@ -208,7 +208,7 @@
             },
             cli: {
                 label: 'CLI',
-                badge: '💻 GitHub Copilot CLI Workshop',
+                badge: '💻 Taller de GitHub Copilot CLI',
                 subtitle: 'Construye la misma app retro arcade mientras aprendes flujos de trabajo nativos del terminal con Copilot: instrucciones personalizadas, /plan, ediciones autónomas, paralelismo con /fleet, /delegate y /review.',
                 copy: 'Usa el taller CLI para quedarte en la terminal mientras planificas, codificas, revisas y paralelizas trabajo con comandos agentic.',
                 highlights: ['copilot', '/plan', '/fleet', '/delegate', '/review'],
@@ -293,7 +293,7 @@
 
         function updateLinks(track) {
             document.getElementById('startWorkshopBtn').href = buildStepUrl('00-overview', track);
-            document.getElementById('startWorkshopBtn').textContent = `🚀 Iniciar Taller ${tracks[track].label}`;
+            document.getElementById('startWorkshopBtn').textContent = `🚀 Empezar el taller de ${tracks[track].label}`;
             document.querySelectorAll('[data-step]').forEach((link) => {
                 link.href = buildStepUrl(link.dataset.step, track);
             });

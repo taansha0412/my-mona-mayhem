@@ -16,7 +16,7 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mona Mayhem Workshop</title>
+    <title>Workshop Mona Mayhem</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="alternate" hreflang="en" href="https://copilot-dev-days.github.io/mona-mayhem/">
@@ -47,16 +47,16 @@
 
     <section class="hero">
         <div class="container">
-            <div class="hero-badge" id="heroBadge">🎮 VS Code GitHub Copilot Workshop</div>
-            <h1>Mona Mayhem Workshop</h1>
+            <div class="hero-badge" id="heroBadge">🎮 Workshop do GitHub Copilot para VS Code</div>
+            <h1>Workshop Mona Mayhem</h1>
             <p class="hero-subtitle" id="heroSubtitle">Construa uma arena de batalha de contribuições GitHub em estilo retrô arcade enquanto domina os recursos do VS Code Copilot: engenharia de contexto, Plan Mode, Agent Mode, desenvolvimento design-first e fluxos de trabalho multi-agent.</p>
             <div class="track-panel">
-                <p class="track-panel-title">Escolha sua superfície Copilot</p>
+                <p class="track-panel-title">Escolha como usar o Copilot</p>
                 <p class="track-panel-copy" id="trackCopy">Use o workshop VS Code para praticar Chat, Plan Mode, Agent Mode, agentes em segundo plano e o ciclo de revisão no editor.</p>
                 <div class="track-highlights" id="trackHighlights"></div>
             </div>
             <div class="hero-cta">
-                <a href="step.html?step=00-overview&amp;track=vscode" class="btn btn-primary" id="startWorkshopBtn">🚀 Iniciar Workshop VS Code</a>
+                <a href="step.html?step=00-overview&amp;track=vscode" class="btn btn-primary" id="startWorkshopBtn">🚀 Comece o workshop de VS Code</a>
                 <a href="https://github.com/copilot-dev-days/mona-mayhem" class="btn btn-secondary" target="_blank">⭐ Repositório GitHub</a>
             </div>
             <p class="hero-note">O alternador atualiza cada etapa do workshop para que a documentação fique alinhada ao fluxo escolhido.</p>
@@ -194,7 +194,7 @@
         const tracks = {
             vscode: {
                 label: 'VS Code',
-                badge: '🎮 VS Code GitHub Copilot Workshop',
+                badge: '🎮 Workshop do GitHub Copilot para VS Code',
                 subtitle: 'Construa uma arena de batalha de contribuições GitHub em estilo retrô arcade enquanto domina os recursos do VS Code Copilot: engenharia de contexto, Plan Mode, Agent Mode, desenvolvimento design-first e fluxos de trabalho multi-agent.',
                 copy: 'Use o workshop VS Code para praticar Chat, Plan Mode, Agent Mode, agentes em segundo plano e o ciclo de revisão no editor.',
                 highlights: ['Chat panel', 'Plan Mode', 'Agent Mode', 'Background agents'],
@@ -208,7 +208,7 @@
             },
             cli: {
                 label: 'CLI',
-                badge: '💻 GitHub Copilot CLI Workshop',
+                badge: '💻 Workshop do GitHub Copilot CLI',
                 subtitle: 'Construa o mesmo app retrô arcade enquanto aprende fluxos de trabalho nativos do terminal com Copilot: instruções personalizadas, /plan, edições autônomas, paralelismo com /fleet, /delegate e /review.',
                 copy: 'Use o workshop CLI para ficar no terminal enquanto planeja, codifica, revisa e paraleliza trabalho com comandos agentic.',
                 highlights: ['copilot', '/plan', '/fleet', '/delegate', '/review'],
@@ -293,7 +293,7 @@
 
         function updateLinks(track) {
             document.getElementById('startWorkshopBtn').href = buildStepUrl('00-overview', track);
-            document.getElementById('startWorkshopBtn').textContent = `🚀 Iniciar Workshop ${tracks[track].label}`;
+            document.getElementById('startWorkshopBtn').textContent = `🚀 Comece o workshop de ${tracks[track].label}`;
             document.querySelectorAll('[data-step]').forEach((link) => {
                 link.href = buildStepUrl(link.dataset.step, track);
             });
