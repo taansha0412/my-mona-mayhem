@@ -1,83 +1,102 @@
-🌐 English | [Español](README.es.md) | [Português (Brasil)](README.pt_BR.md) | [한국어](README.ko.md)
+<div align="center">
 
 # 🎮 Mona Mayhem
 
-**VS Code & GitHub Copilot CLI Workshop** — Build a GitHub Contribution Battle Arena
+### Press start. Pick a rival. Let the contributions battle.
 
-A workshop template for building a retro arcade-themed website with Astro that compares GitHub contribution graphs of two users. This is the **starting point** — you'll build the app step by step using GitHub Copilot.
+Build a retro arcade arena that turns GitHub contribution activity into a head-to-head showdown—with **GitHub Copilot** as your coding co-pilot.
 
-![Mona Mayhem Screenshot](https://github.com/user-attachments/assets/5eca79e2-cb9f-4e93-aa0d-23666ebde3b7)
-*What you'll build by the end of the workshop*
+<a href="workshop/00-overview.md"><strong>▶ Start the workshop</strong></a>
+&nbsp; · &nbsp;
+<a href="#choose-your-player">Choose your track</a>
+&nbsp; · &nbsp;
+<a href="#run-it-locally">Run it locally</a>
 
-## 📚 Workshop
+</div>
 
-The workshop supports two tracks — follow the one that matches your preferred workflow:
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/5eca79e2-cb9f-4e93-aa0d-23666ebde3b7" alt="Preview of the Mona Mayhem retro arcade contribution battle arena" width="900" />
+</p>
 
-- **VS Code track** — Chat, Plan Mode, Agent Mode, background agents, and editor-native review loops
-- **CLI track** — `copilot`, `@file` context, `/plan`, autonomous edits, `/fleet`, `/delegate`, and `/review`
+> **Workshop starter:** The image previews the arena you’ll build through the workshop. The app in this repository is the starting point—not the finished game.
 
-| Part | Title | Copilot Focus |
-|------|-------|---------------|
-| [00](workshop/00-overview.md) | Overview | Track selection and learning goals |
-| [01](workshop/01-setup.md) | Setup & Context Engineering | Instructions, permissions, and environment setup |
-| [02](workshop/02-plan-and-scaffold.md) | Plan & Scaffold | Planning the API and page architecture |
-| [03](workshop/03-agent-mode.md) | Build the Game | Agentic implementation and iteration |
-| [04](workshop/04-design-vibes.md) | Design-First Theming | Visual design planning and implementation |
-| [05](workshop/05-polish.md) | Polish & Parallel Work | Parallelism, reviews, and quality passes |
-| [06](workshop/06-bonus.md) | Bonus & Extensions | Open-ended feature ideas and extra Copilot experiments |
+🌐 English | [Español](README.es.md) | [Português (Brasil)](README.pt_BR.md) | [한국어](README.ko.md)
 
-## 🚀 Quick Start
+## Your next coding side quest
 
-1. **Create your own repo first** by either:
-   - clicking **Use this template** to create a new repo, or
-   - forking this repository.
-2. Choose your workshop path:
-   - **VS Code:** clone your repo and open it in VS Code.
-   - **GitHub Copilot CLI:** clone your repo locally, install `copilot`, and work from your terminal.
-3. Follow the [workshop guide](workshop/00-overview.md)
+Mona Mayhem is a hands-on workshop for building an Astro app that compares the GitHub contribution activity of two users. Go from starter project to arcade-inspired experience while practicing how to plan, give an AI coding agent useful context, build iteratively, and polish a real project.
 
-## Prerequisites
+### Choose your player
 
-### Shared
+Both tracks build the same project. Pick the workflow that feels right and follow the [workshop overview](workshop/00-overview.md).
+
+| 🧑‍💻 VS Code | 💻 GitHub Copilot CLI |
+| --- | --- |
+| Work in the editor with Chat, Plan Mode, Agent Mode, background agents, and review loops. | Build from your terminal with `copilot`, `@file` context, `/plan`, `/fleet`, `/delegate`, and `/review`. |
+
+[Open the workshop overview to choose your track →](workshop/00-overview.md)
+
+### The quest log
+
+<details>
+<summary>See all workshop levels</summary>
+
+| Part | Level | What you’ll do |
+| --- | --- | --- |
+| [00](workshop/00-overview.md) | Overview | Choose a track and see what you’ll learn |
+| [01](workshop/01-setup.md) | Setup & Context Engineering | Prepare your environment and give Copilot useful context |
+| [02](workshop/02-plan-and-scaffold.md) | Plan & Scaffold | Shape the API and page architecture |
+| [03](workshop/03-agent-mode.md) | Build the Game | Implement the arena with agentic help |
+| [04](workshop/04-design-vibes.md) | Design-First Theming | Give the app its retro arcade look |
+| [05](workshop/05-polish.md) | Polish & Parallel Work | Refine the experience and work in parallel |
+| [06](workshop/06-bonus.md) | Bonus & Extensions | Try extra features and Copilot experiments |
+
+</details>
+
+## Start playing
+
+1. **Create your own copy** with **Use this template** on GitHub, or fork this repository.
+2. **Clone your copy** and open it in VS Code—or open a terminal for the CLI track.
+3. **Choose your track** in the [workshop overview](workshop/00-overview.md) and jump into Level 01.
+
+### What you’ll need
 
 - GitHub Copilot (Pro, Business, or Enterprise)
-- Git
-- Node.js
+- Git and Node.js
+- **VS Code track:** VS Code v1.107+ and the GitHub Copilot extension, signed in
+- **CLI track:** GitHub Copilot CLI (`copilot`). Installing it with `npm install -g @github/copilot` requires Node.js 22+; Homebrew and WinGet are also options.
 
-### VS Code track
+## Run it locally
 
-- VS Code v1.107+
-- GitHub Copilot extension signed in
+```sh
+npm install
+npm run dev
+```
 
-### CLI track
+Then open the local URL printed by Astro. To check the app before sharing your changes:
 
-- GitHub Copilot CLI (`copilot`)
-- Node.js 22+ if you plan to install the CLI via `npm install -g @github/copilot`
-- Or Homebrew / WinGet if you prefer a native package manager install
+```sh
+npm run lint
+npm run build
+```
 
-## Technology Stack
+<details>
+<summary>Tech stack & deployment notes</summary>
 
-- **Framework**: [Astro](https://astro.build/) v6
-- **Runtime**: Node.js with [@astrojs/node](https://docs.astro.build/en/guides/integrations-guide/node/) adapter
-- **Font**: Press Start 2P (retro gaming font)
-- **API**: GitHub's contribution graph API
+- **Framework:** [Astro](https://astro.build/) v6 with the [Node adapter](https://docs.astro.build/en/guides/integrations-guide/node/)
+- **Language:** TypeScript
+- **Arcade typeface:** Press Start 2P
+- **Data:** GitHub contribution graphs
 
-## Deployment Notes
+The `GET /api/contributions/:username` route fetches contribution JSON server-side. Successful responses are cached in memory for one hour, with a 100-user limit per server process; cache entries are not shared across instances.
 
-### Current GitHub Pages setup
+The current workflow in `.github/workflows/deploy.yml` publishes static workshop and documentation content from `docs/` and `workshop/` to GitHub Pages. It does **not** build or deploy the Astro app in `src/`.
 
-The workflow in `.github/workflows/deploy.yml` currently deploys static workshop/docs content from `docs/` and `workshop/` to GitHub Pages. It does not build or deploy the Astro app from `src/`.
+To deploy the Astro app to GitHub Pages, switch Astro to static output, remove the Node adapter, and update the workflow to build and publish `dist/`. For a project page at `https://<user>.github.io/<repo>/`, also configure `site` and `base` in `astro.config.mjs`.
 
-### If you want to deploy the Astro app to GitHub Pages
+If you want to keep API routes running in production, use a server platform such as Vercel, Netlify, or a Node host instead of GitHub Pages.
 
-GitHub Pages is static hosting, so the Astro app should use static output.
-
-1. Change `output` in `astro.config.mjs` from `server` to `static`.
-2. Remove the Node adapter (`@astrojs/node`) from `astro.config.mjs` and `package.json`.
-3. Update the GitHub Actions workflow to run `npm ci` and `npm run build`, then upload `dist/` as the Pages artifact.
-4. If deploying to a project page (`https://<user>.github.io/<repo>/`), set `site` and `base` in `astro.config.mjs`.
-
-If you plan to keep API routes running in production, use a server platform instead of GitHub Pages (for example, Vercel, Netlify, or a Node host).
+</details>
 
 ## License
 

@@ -1,5 +1,4 @@
 ---
-
 ---
 
 <html lang="en">
@@ -8,10 +7,350 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Mona Mayhem</title>
+		<meta name="description" content="Compare GitHub contributions in a head-to-head battle." />
+		<title>Mona Mayhem - GitHub Contribution Battle Arena</title>
 	</head>
 	<body>
-		<h1>Mona Mayhem</h1>
-		<p>Welcome to Mona Mayhem! Time to build a GitHub Contribution Battle Arena.</p>
+		<main class="arena">
+			<header class="intro">
+				<p class="eyebrow">GitHub Contribution Battle Arena</p>
+				<h1>Mona Mayhem</h1>
+				<p>Pick two players and see whose contributions come out on top.</p>
+			</header>
+
+			<form id="battle-form" class="battle-form">
+				<div class="players">
+					<label class="player-input">
+						<span>Player 1</span>
+						<input
+							id="player-one"
+							name="playerOne"
+							type="text"
+							autocomplete="off"
+							placeholder="GitHub username"
+							required
+						/>
+					</label>
+					<label class="player-input">
+						<span>Player 2</span>
+						<input
+							id="player-two"
+							name="playerTwo"
+							type="text"
+							autocomplete="off"
+							placeholder="GitHub username"
+							required
+						/>
+					</label>
+				</div>
+				<button id="battle-button" type="submit">Battle!</button>
+			</form>
+
+			<section id="results" class="results" aria-labelledby="results-title" hidden>
+				<h2 id="results-title">Battle results</h2>
+				<p id="battle-status" role="status" aria-live="polite"></p>
+				<div id="player-results" class="player-results" hidden>
+					<article class="result-card">
+						<h3 id="player-one-name"></h3>
+						<p><strong id="player-one-total"></strong> contributions</p>
+					</article>
+					<article class="result-card">
+						<h3 id="player-two-name"></h3>
+						<p><strong id="player-two-total"></strong> contributions</p>
+					</article>
+				</div>
+				<p id="battle-winner" class="winner" hidden></p>
+			</section>
+		</main>
+
+		<style>
+			:root {
+				font-family: system-ui, sans-serif;
+				color: #25213a;
+				background: #f7f5ff;
+				font-synthesis: none;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				min-width: 320px;
+			}
+
+			.arena {
+				width: min(100% - 2rem, 44rem);
+				margin: 0 auto;
+				padding: 4rem 0;
+			}
+
+			.intro {
+				margin-bottom: 2rem;
+				text-align: center;
+			}
+
+			.eyebrow {
+				margin: 0 0 0.75rem;
+				color: #6656a8;
+				font-size: 0.8rem;
+				font-weight: 700;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+			}
+
+			h1,
+			h2,
+			h3,
+			p {
+				margin-top: 0;
+			}
+
+			h1 {
+				margin-bottom: 0.5rem;
+				font-size: clamp(2rem, 8vw, 3.25rem);
+			}
+
+			.intro > p:last-child {
+				margin-bottom: 0;
+				color: #5f5b70;
+			}
+
+			.battle-form,
+			.results {
+				padding: 1.5rem;
+				border: 1px solid #e4dff3;
+				border-radius: 1rem;
+				background: #fff;
+				box-shadow: 0 0.75rem 2rem rgb(37 33 58 / 6%);
+			}
+
+			.players,
+			.player-results {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 1rem;
+			}
+
+			.player-input {
+				display: grid;
+				gap: 0.5rem;
+				font-weight: 650;
+			}
+
+			input {
+				width: 100%;
+				padding: 0.8rem 0.9rem;
+				border: 1px solid #cfc9df;
+				border-radius: 0.5rem;
+				color: inherit;
+				font: inherit;
+			}
+
+			input:focus-visible,
+			button:focus-visible {
+				outline: 3px solid #a99ae8;
+				outline-offset: 2px;
+			}
+
+			button {
+				display: block;
+				min-width: 8rem;
+				margin: 1.25rem auto 0;
+				padding: 0.8rem 1.25rem;
+				border: 0;
+				border-radius: 0.5rem;
+				background: #5946a5;
+				color: #fff;
+				font: inherit;
+				font-weight: 700;
+				cursor: pointer;
+			}
+
+			button:hover:not(:disabled) {
+				background: #46348e;
+			}
+
+			button:disabled {
+				cursor: wait;
+				opacity: 0.7;
+			}
+
+			.results {
+				margin-top: 1.5rem;
+			}
+
+			.results h2 {
+				margin-bottom: 0.75rem;
+				font-size: 1.25rem;
+			}
+
+			#battle-status {
+				margin-bottom: 0;
+				color: #5f5b70;
+			}
+
+			.player-results {
+				margin-top: 1rem;
+			}
+
+			.result-card {
+				padding: 1rem;
+				border-radius: 0.75rem;
+				background: #f4f1ff;
+				text-align: center;
+			}
+
+			.result-card h3 {
+				margin-bottom: 0.35rem;
+				overflow-wrap: anywhere;
+			}
+
+			.result-card p {
+				margin-bottom: 0;
+			}
+
+			.result-card strong {
+				color: #5946a5;
+				font-size: 1.2rem;
+			}
+
+			.winner {
+				margin: 1rem 0 0;
+				font-weight: 700;
+				text-align: center;
+			}
+
+			@media (max-width: 36rem) {
+				.arena {
+					padding: 2.5rem 0;
+				}
+
+				.players,
+				.player-results {
+					grid-template-columns: 1fr;
+				}
+
+				.battle-form,
+				.results {
+					padding: 1.15rem;
+				}
+			}
+		</style>
+
+		<script>
+			type ContributionData = {
+				total_contributions: number;
+			};
+
+			const form = document.querySelector<HTMLFormElement>('#battle-form');
+			const playerOneInput = document.querySelector<HTMLInputElement>('#player-one');
+			const playerTwoInput = document.querySelector<HTMLInputElement>('#player-two');
+			const battleButton = document.querySelector<HTMLButtonElement>('#battle-button');
+			const results = document.querySelector<HTMLElement>('#results');
+			const battleStatus = document.querySelector<HTMLElement>('#battle-status');
+			const playerResults = document.querySelector<HTMLElement>('#player-results');
+			const playerOneName = document.querySelector<HTMLElement>('#player-one-name');
+			const playerTwoName = document.querySelector<HTMLElement>('#player-two-name');
+			const playerOneTotal = document.querySelector<HTMLElement>('#player-one-total');
+			const playerTwoTotal = document.querySelector<HTMLElement>('#player-two-total');
+			const battleWinner = document.querySelector<HTMLElement>('#battle-winner');
+
+			if (
+				!form ||
+				!playerOneInput ||
+				!playerTwoInput ||
+				!battleButton ||
+				!results ||
+				!battleStatus ||
+				!playerResults ||
+				!playerOneName ||
+				!playerTwoName ||
+				!playerOneTotal ||
+				!playerTwoTotal ||
+				!battleWinner
+			) {
+				throw new Error('Battle page is missing a required element.');
+			}
+
+			async function fetchContributions(username: string): Promise<ContributionData> {
+				const response = await fetch(`/api/contributions/${encodeURIComponent(username)}`);
+				const data: unknown = await response.json();
+
+				if (!response.ok) {
+					const message =
+						typeof data === 'object' &&
+						data !== null &&
+						'error' in data &&
+						typeof data.error === 'object' &&
+						data.error !== null &&
+						'message' in data.error &&
+						typeof data.error.message === 'string'
+							? data.error.message
+							: `Could not load contributions for ${username}.`;
+					throw new Error(message);
+				}
+
+				if (
+					typeof data !== 'object' ||
+					data === null ||
+					!('total_contributions' in data) ||
+					typeof data.total_contributions !== 'number' ||
+					!Number.isFinite(data.total_contributions)
+				) {
+					throw new Error(`Contribution data for ${username} was not in the expected format.`);
+				}
+
+				return { total_contributions: data.total_contributions };
+			}
+
+			form.addEventListener('submit', async (event) => {
+				event.preventDefault();
+
+				const firstUsername = playerOneInput.value.trim();
+				const secondUsername = playerTwoInput.value.trim();
+
+				if (!firstUsername || !secondUsername) {
+					battleStatus.textContent = 'Enter both GitHub usernames to start a battle.';
+					results.hidden = false;
+					return;
+				}
+
+				battleButton.disabled = true;
+				battleButton.textContent = 'Battling...';
+				form.setAttribute('aria-busy', 'true');
+				results.hidden = false;
+				playerResults.hidden = true;
+				battleWinner.hidden = true;
+				battleStatus.textContent = 'Loading contribution data...';
+
+				try {
+					const [firstData, secondData] = await Promise.all([
+						fetchContributions(firstUsername),
+						fetchContributions(secondUsername),
+					]);
+
+					playerOneName.textContent = firstUsername;
+					playerTwoName.textContent = secondUsername;
+					playerOneTotal.textContent = firstData.total_contributions.toLocaleString();
+					playerTwoTotal.textContent = secondData.total_contributions.toLocaleString();
+					battleStatus.textContent = 'The results are in!';
+					playerResults.hidden = false;
+					battleWinner.textContent =
+						firstData.total_contributions === secondData.total_contributions
+							? "It's a tie!"
+							: `${firstData.total_contributions > secondData.total_contributions ? firstUsername : secondUsername} wins!`;
+					battleWinner.hidden = false;
+				} catch (error) {
+					battleStatus.textContent =
+						error instanceof Error ? error.message : 'Could not load contribution data. Please try again.';
+				} finally {
+					battleButton.disabled = false;
+					battleButton.textContent = 'Battle!';
+					form.removeAttribute('aria-busy');
+				}
+			});
+		</script>
 	</body>
 </html>
