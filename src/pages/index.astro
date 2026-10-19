@@ -819,6 +819,16 @@
 				weeks: ContributionWeek[];
 			}
 
+			interface BattleHistoryEntry {
+				playerOneUsername: string;
+				playerOneTotal: number;
+				playerTwoUsername: string;
+				playerTwoTotal: number;
+				winner: string | null;
+				timestamp: string;
+			}
+
+			const historyStorageKey = 'mona-mayhem-battle-history';
 			const form = document.querySelector<HTMLFormElement>('#battle-form');
 			const playerOneInput = document.querySelector<HTMLInputElement>('#player-one');
 			const playerTwoInput = document.querySelector<HTMLInputElement>('#player-two');
@@ -841,6 +851,9 @@
 			const playerOneStreak = document.querySelector<HTMLElement>('#player-one-streak');
 			const playerTwoStreak = document.querySelector<HTMLElement>('#player-two-streak');
 			const battleWinner = document.querySelector<HTMLElement>('#battle-winner');
+			const historyStatus = document.querySelector<HTMLElement>('#history-status');
+			const battleHistoryList = document.querySelector<HTMLOListElement>('#battle-history-list');
+			const clearHistoryButton = document.querySelector<HTMLButtonElement>('#clear-history');
 
 			if (
 				!form ||
@@ -864,10 +877,15 @@
 				!playerTwoGraph ||
 				!playerOneStreak ||
 				!playerTwoStreak ||
-				!battleWinner
+				!battleWinner ||
+				!historyStatus ||
+				!battleHistoryList ||
+				!clearHistoryButton
 			) {
 				throw new Error('Battle page is missing a required element.');
 			}
+
+			let battleHistory: BattleHistoryEntry[] = [];
 
 			themeToggle.addEventListener('click', () => {
 				const useBlueOrange = document.documentElement.dataset.theme !== 'blue-orange';
@@ -994,6 +1012,136 @@
 			function isRecord(value: unknown): value is Record<string, unknown> {
 				return typeof value === 'object' && value !== null;
 			}
+
+			function isBattleHistoryEntry(value: unknown): value is BattleHistoryEntry {
+				return (
+					isRecord(value) &&
+					typeof value.playerOneUsername === 'string' &&
+					typeof value.playerTwoUsername === 'string' &&
+					typeof value.playerOneTotal === 'number' &&
+					Number.isInteger(value.playerOneTotal) &&
+					value.playerOneTotal >= 0 &&
+					typeof value.playerTwoTotal === 'number' &&
+					Number.isInteger(value.playerTwoTotal) &&
+					value.playerTwoTotal >= 0 &&
+					(value.winner === null ||
+						value.winner === value.playerOneUsername ||
+						value.winner === value.playerTwoUsername) &&
+					typeof value.timestamp === 'string' &&
+					Number.isFinite(Date.parse(value.timestamp))
+				);
+			}
+
+			function setHistoryStatus(message: string, isError = false): void {
+				historyStatus.textContent = message;
+				historyStatus.hidden = !message;
+				historyStatus.classList.toggle('is-error', isError);
+			}
+
+			function formatBattleTimestamp(timestamp: string): string {
+				return new Intl.DateTimeFormat(undefined, {
+					dateStyle: 'medium',
+					timeStyle: 'short',
+				}).format(new Date(timestamp));
+			}
+
+			function renderBattleHistory(): void {
+				battleHistoryList.replaceChildren();
+
+				for (const battle of battleHistory) {
+					const item = document.createElement('li');
+					item.className = 'battle-history-item';
+
+					const matchup = document.createElement('div');
+					const names = document.createElement('p');
+					const firstName = document.createElement('strong');
+					firstName.textContent = battle.playerOneUsername;
+					const secondName = document.createElement('strong');
+					secondName.textContent = battle.playerTwoUsername;
+					names.append(
+						firstName,
+						document.createTextNode(' vs '),
+						secondName,
+					);
+
+					const totals = document.createElement('p');
+					totals.className = 'history-totals';
+					totals.textContent = `${battle.playerOneTotal.toLocaleString()} vs ${battle.playerTwoTotal.toLocaleString()} contributions`;
+					matchup.append(names, totals);
+
+					const outcome = document.createElement('div');
+					outcome.className = 'history-outcome';
+					const winner = document.createElement('strong');
+					winner.textContent = battle.winner ? `${battle.winner} wins` : "It's a tie";
+					const happenedAt = document.createElement('time');
+					happenedAt.dateTime = battle.timestamp;
+					happenedAt.textContent = formatBattleTimestamp(battle.timestamp);
+					outcome.append(winner, happenedAt);
+
+					item.append(matchup, outcome);
+					battleHistoryList.append(item);
+				}
+			}
+
+			function loadBattleHistory(): void {
+				try {
+					const savedHistory = localStorage.getItem(historyStorageKey);
+					if (savedHistory === null) {
+						renderBattleHistory();
+						return;
+					}
+
+					const parsedHistory: unknown = JSON.parse(savedHistory);
+					if (!Array.isArray(parsedHistory) || !parsedHistory.every(isBattleHistoryEntry)) {
+						throw new Error('Saved battle history is in an unexpected format.');
+					}
+
+					battleHistory = parsedHistory.slice(0, 10);
+					renderBattleHistory();
+				} catch (error) {
+					setHistoryStatus(
+						error instanceof Error
+							? `Could not load battle history: ${error.message}`
+							: 'Could not load battle history.',
+						true,
+					);
+				}
+			}
+
+			function saveBattleResult(entry: BattleHistoryEntry): void {
+				const nextHistory = [entry, ...battleHistory].slice(0, 10);
+				try {
+					localStorage.setItem(historyStorageKey, JSON.stringify(nextHistory));
+					battleHistory = nextHistory;
+					renderBattleHistory();
+					setHistoryStatus('');
+				} catch (error) {
+					setHistoryStatus(
+						error instanceof Error
+							? `Battle completed, but history could not be saved: ${error.message}`
+							: 'Battle completed, but history could not be saved.',
+						true,
+					);
+				}
+			}
+
+			clearHistoryButton.addEventListener('click', () => {
+				try {
+					localStorage.removeItem(historyStorageKey);
+					battleHistory = [];
+					renderBattleHistory();
+					setHistoryStatus('');
+				} catch (error) {
+					setHistoryStatus(
+						error instanceof Error
+							? `Could not clear battle history: ${error.message}`
+							: 'Could not clear battle history.',
+						true,
+					);
+				}
+			});
+
+			loadBattleHistory();
 
 			function isIsoDate(value: unknown): value is string {
 				if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -1223,6 +1371,18 @@
 						? "🤝 IT'S A TIE! 🤝"
 						: `🏆 ${firstData.total_contributions > secondData.total_contributions ? firstUsername : secondUsername} WINS! 🏆`;
 					battleWinner.hidden = false;
+					saveBattleResult({
+						playerOneUsername: firstUsername,
+						playerOneTotal: firstData.total_contributions,
+						playerTwoUsername: secondUsername,
+						playerTwoTotal: secondData.total_contributions,
+						winner: isTie
+							? null
+							: firstData.total_contributions > secondData.total_contributions
+								? firstUsername
+								: secondUsername,
+						timestamp: new Date().toISOString(),
+					});
 					playPowerUp();
 				} catch (error) {
 					playExplosion();
