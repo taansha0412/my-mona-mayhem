@@ -25,3 +25,10 @@
 - API handlers should validate route input, return explicit HTTP status codes and JSON headers, and report upstream failures. The contribution endpoint's error payload is `{ error: { code, message } }`.
 - ESLint enforces tabs, single quotes, semicolons, trailing commas on multiline constructs, and spaces inside object braces.
 - Put files served unchanged from the site root in `public/`.
+
+## Design Guide
+
+- Keep the battle page in a dark retro arcade style. Use `#0a0a1a` for the page background, `#5fed83` as the neon green accent, and `#8a2be2` as the purple accent. Use pale text for readable contrast.
+- Use Press Start 2P from Google Fonts for arcade display text, with a system sans-serif fallback for supporting text and controls.
+- Favor restrained neon glows, CRT scanlines, and green-to-purple gradients. Animation should feel like an arcade cabinet: slow neon pulses, brief entrance motion, subtle shimmer, and small hover responses rather than constant rapid movement.
+- Keep decorative effects from obscuring content or blocking interaction. Preserve visible keyboard focus and respect `prefers-reduced-motion` by reducing or disabling non-essential animations.

@@ -8,11 +8,20 @@
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content="Compare GitHub contributions in a head-to-head battle." />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+			rel="stylesheet"
+		/>
 		<title>Mona Mayhem - GitHub Contribution Battle Arena</title>
 	</head>
 	<body>
 		<main class="arena">
 			<header class="intro">
+				<button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">
+					Switch to Blue + Orange
+				</button>
 				<p class="eyebrow">GitHub Contribution Battle Arena</p>
 				<h1>Mona Mayhem</h1>
 				<p>Pick two players and see whose contributions come out on top.</p>
@@ -29,7 +38,10 @@
 							autocomplete="off"
 							placeholder="GitHub username"
 							required
+							maxlength="39"
+							aria-describedby="player-one-error"
 						/>
+						<span id="player-one-error" class="input-error" aria-live="polite" hidden></span>
 					</label>
 					<label class="player-input">
 						<span>Player 2</span>
@@ -40,7 +52,10 @@
 							autocomplete="off"
 							placeholder="GitHub username"
 							required
+							maxlength="39"
+							aria-describedby="player-two-error"
 						/>
+						<span id="player-two-error" class="input-error" aria-live="polite" hidden></span>
 					</label>
 				</div>
 				<button id="battle-button" type="submit">Battle!</button>
@@ -64,16 +79,28 @@
 						<div id="player-two-graph" class="contribution-graph" role="img"></div>
 					</article>
 				</div>
-				<p id="battle-winner" class="winner" hidden></p>
+				<p id="battle-winner" class="winner" role="status" aria-live="polite" hidden></p>
 			</section>
 		</main>
 
 		<style>
 			:root {
+				--accent-primary: #5fed83;
+				--accent-primary-rgb: 95 237 131;
+				--accent-secondary: #8a2be2;
+				--accent-secondary-rgb: 138 43 226;
 				font-family: system-ui, sans-serif;
-				color: #25213a;
-				background: #f7f5ff;
+				color: #e9e7f5;
+				background: #0a0a1a;
 				font-synthesis: none;
+				color-scheme: dark;
+			}
+
+			:root[data-theme='blue-orange'] {
+				--accent-primary: #00f5ff;
+				--accent-primary-rgb: 0 245 255;
+				--accent-secondary: #ff6b35;
+				--accent-secondary-rgb: 255 107 53;
 			}
 
 			* {
@@ -81,11 +108,37 @@
 			}
 
 			body {
+				position: relative;
 				margin: 0;
 				min-width: 320px;
+				min-height: 100vh;
+				background:
+					radial-gradient(
+						ellipse at 50% 0%,
+						rgb(var(--accent-secondary-rgb) / 14%),
+						transparent 55%
+					),
+					#0a0a1a;
+			}
+
+			body::before {
+				position: fixed;
+				z-index: 5;
+				background: repeating-linear-gradient(
+					to bottom,
+					transparent 0,
+					transparent 3px,
+					rgb(0 0 0 / 30%) 4px,
+					rgb(0 0 0 / 30%) 5px
+				);
+				content: '';
+				inset: 0;
+				pointer-events: none;
 			}
 
 			.arena {
+				position: relative;
+				z-index: 1;
 				width: min(100% - 2rem, 44rem);
 				margin: 0 auto;
 				padding: 4rem 0;
@@ -98,11 +151,30 @@
 
 			.eyebrow {
 				margin: 0 0 0.75rem;
-				color: #6656a8;
+				color: var(--accent-primary);
 				font-size: 0.8rem;
 				font-weight: 700;
 				letter-spacing: 0.08em;
 				text-transform: uppercase;
+				text-shadow: 0 0 0.8rem rgb(var(--accent-primary-rgb) / 55%);
+			}
+
+			.theme-toggle {
+				min-width: 0;
+				margin: 0 0 1.5rem;
+				padding: 0.55rem 0.75rem;
+				border-color: var(--accent-secondary);
+				background: transparent;
+				color: var(--accent-primary);
+				font-family: system-ui, sans-serif;
+				font-size: 0.7rem;
+				box-shadow: 0 0 0.8rem rgb(var(--accent-secondary-rgb) / 20%);
+			}
+
+			.theme-toggle:hover:not(:disabled) {
+				box-shadow:
+					0 0 0.75rem rgb(var(--accent-primary-rgb) / 45%),
+					0 0 1.25rem rgb(var(--accent-secondary-rgb) / 35%);
 			}
 
 			h1,
@@ -115,20 +187,30 @@
 			h1 {
 				margin-bottom: 0.5rem;
 				font-size: clamp(2rem, 8vw, 3.25rem);
+				font-family: 'Press Start 2P', system-ui, sans-serif;
+				color: #f4fff7;
+				text-shadow:
+					0 0 0.2rem #fff,
+					0 0 0.75rem var(--accent-primary),
+					0 0 1.5rem rgb(var(--accent-primary-rgb) / 80%),
+					0 0 2.5rem rgb(var(--accent-secondary-rgb) / 55%);
+				animation: neon-pulse 2.8s ease-in-out infinite alternate;
 			}
 
 			.intro > p:last-child {
 				margin-bottom: 0;
-				color: #5f5b70;
+				color: #b9b5cc;
 			}
 
 			.battle-form,
 			.results {
 				padding: 1.5rem;
-				border: 1px solid #e4dff3;
+				border: 1px solid rgb(var(--accent-secondary-rgb) / 45%);
 				border-radius: 1rem;
-				background: #fff;
-				box-shadow: 0 0.75rem 2rem rgb(37 33 58 / 6%);
+				background: linear-gradient(145deg, rgb(24 23 48 / 96%), rgb(14 14 32 / 98%));
+				box-shadow:
+					0 0.75rem 2rem rgb(0 0 0 / 35%),
+					0 0 1.5rem rgb(var(--accent-secondary-rgb) / 12%);
 			}
 
 			.players {
@@ -148,22 +230,71 @@
 			.player-input {
 				display: grid;
 				gap: 0.5rem;
-				font-weight: 650;
+				color: var(--accent-primary);
+				font-weight: 700;
+				animation: float-in 700ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+			}
+
+			.player-input:nth-child(2) {
+				animation-delay: 130ms;
 			}
 
 			input {
 				width: 100%;
 				padding: 0.8rem 0.9rem;
-				border: 1px solid #cfc9df;
+				border: 1px solid rgb(var(--accent-secondary-rgb) / 65%);
 				border-radius: 0.5rem;
-				color: inherit;
+				background: #0a0a1a;
+				color: #f5f2ff;
 				font: inherit;
+				box-shadow: inset 0 0 0.8rem rgb(var(--accent-secondary-rgb) / 8%);
+				transition:
+					border-color 180ms ease,
+					box-shadow 180ms ease;
+			}
+
+			input::placeholder {
+				color: #817c9b;
+			}
+
+			.player-input.has-error {
+				animation: error-shake 420ms ease-in-out;
+			}
+
+			input[aria-invalid='true'] {
+				border-color: #ff3366;
+				box-shadow:
+					0 0 0 1px #ff3366,
+					0 0 1rem rgb(255 51 102 / 45%);
+			}
+
+			.input-error {
+				color: #ff3366;
+				font-size: 0.8rem;
+				font-weight: 600;
+				text-shadow:
+					0 0 0.35rem rgb(255 51 102 / 75%),
+					0 0 0.8rem rgb(255 51 102 / 45%);
 			}
 
 			input:focus-visible,
 			button:focus-visible {
-				outline: 3px solid #a99ae8;
+				outline: 3px solid var(--accent-primary);
 				outline-offset: 2px;
+			}
+
+			input:focus-visible {
+				border-color: var(--accent-primary);
+				box-shadow:
+					0 0 0 1px var(--accent-primary),
+					0 0 1rem rgb(var(--accent-primary-rgb) / 35%);
+			}
+
+			input[aria-invalid='true']:focus-visible {
+				border-color: #ff3366;
+				box-shadow:
+					0 0 0 1px #ff3366,
+					0 0 1rem rgb(255 51 102 / 45%);
 			}
 
 			button {
@@ -171,17 +302,25 @@
 				min-width: 8rem;
 				margin: 1.25rem auto 0;
 				padding: 0.8rem 1.25rem;
-				border: 0;
+				border: 1px solid var(--accent-primary);
 				border-radius: 0.5rem;
-				background: #5946a5;
-				color: #fff;
-				font: inherit;
+				background: linear-gradient(120deg, var(--accent-primary), var(--accent-secondary));
+				color: #0a0a1a;
+				font-family: 'Press Start 2P', system-ui, sans-serif;
+				font-size: 0.7rem;
 				font-weight: 700;
 				cursor: pointer;
+				box-shadow: 0 0 1rem rgb(var(--accent-primary-rgb) / 25%);
+				transition:
+					box-shadow 180ms ease,
+					transform 180ms ease;
 			}
 
 			button:hover:not(:disabled) {
-				background: #46348e;
+				transform: translateY(-2px);
+				box-shadow:
+					0 0 0.75rem rgb(var(--accent-primary-rgb) / 65%),
+					0 0 1.5rem rgb(var(--accent-secondary-rgb) / 50%);
 			}
 
 			button:disabled {
@@ -195,25 +334,65 @@
 
 			.results h2 {
 				margin-bottom: 0.75rem;
-				font-size: 1.25rem;
+				font-family: 'Press Start 2P', system-ui, sans-serif;
+				font-size: 0.85rem;
+				line-height: 1.7;
+				color: var(--accent-primary);
 			}
 
 			#battle-status {
 				margin-bottom: 0;
-				color: #5f5b70;
+				color: #b9b5cc;
+			}
+
+			#battle-status.is-loading {
+				color: var(--accent-primary);
+				animation: loading-color-shift 1.2s ease-in-out infinite alternate;
+			}
+
+			#battle-status.is-error {
+				color: #ff3366;
+				text-shadow:
+					0 0 0.35rem rgb(255 51 102 / 75%),
+					0 0 0.8rem rgb(255 51 102 / 45%);
 			}
 
 			.result-card {
+				position: relative;
 				min-width: 0;
+				overflow: hidden;
 				padding: 1rem;
+				border: 1px solid rgb(var(--accent-secondary-rgb) / 45%);
 				border-radius: 0.75rem;
-				background: #f4f1ff;
+				background: linear-gradient(145deg, #181730, #101024);
 				text-align: center;
+				box-shadow: 0 0 1rem rgb(var(--accent-secondary-rgb) / 12%);
+			}
+
+			.result-card::after {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: -75%;
+				width: 45%;
+				background: linear-gradient(
+					100deg,
+					transparent,
+					rgb(255 255 255 / 10%),
+					rgb(var(--accent-primary-rgb) / 16%),
+					transparent
+				);
+				content: '';
+				pointer-events: none;
+				transform: skewX(-18deg);
+				animation: card-shimmer 5s ease-in-out infinite;
 			}
 
 			.result-card h3 {
 				margin-bottom: 0.35rem;
 				overflow-wrap: anywhere;
+				color: var(--accent-primary);
+				text-shadow: 0 0 0.65rem rgb(var(--accent-primary-rgb) / 38%);
 			}
 
 			.result-card p {
@@ -222,7 +401,7 @@
 
 			.date-range {
 				margin-top: 0.4rem;
-				color: #5f5b70;
+				color: #aaa5c2;
 				font-size: 0.8rem;
 			}
 
@@ -243,6 +422,26 @@
 				width: 0.65rem;
 				height: 0.65rem;
 				border-radius: 2px;
+				background-color: var(--source-color);
+				transition:
+					box-shadow 140ms ease,
+					transform 140ms ease;
+			}
+
+			:root[data-theme='blue-orange'] .contribution-day {
+				background-color: color-mix(
+					in srgb,
+					var(--accent-primary) var(--contribution-intensity),
+					#0a0a1a
+				);
+			}
+
+			.contribution-day:hover {
+				z-index: 1;
+				transform: scale(1.35);
+				box-shadow:
+					0 0 0.35rem var(--accent-primary),
+					0 0 0.8rem var(--accent-secondary);
 			}
 
 			.vs-badge {
@@ -251,45 +450,240 @@
 				height: 2.75rem;
 				margin: 0;
 				place-items: center;
+				border: 1px solid rgb(255 255 255 / 35%);
 				border-radius: 50%;
-				background: #5946a5;
-				color: #fff;
-				font-size: 0.85rem;
+				background: linear-gradient(
+					135deg,
+					var(--accent-primary),
+					var(--accent-secondary),
+					var(--accent-primary)
+				);
+				background-size: 250% 250%;
+				color: #0a0a1a;
+				font-family: 'Press Start 2P', system-ui, sans-serif;
+				font-size: 0.55rem;
 				font-weight: 800;
+				text-shadow: 0 1px rgb(255 255 255 / 30%);
+				box-shadow:
+					0 0 0.85rem rgb(var(--accent-secondary-rgb) / 60%),
+					0 0 1.4rem rgb(var(--accent-primary-rgb) / 28%);
+				animation: vs-gradient-shift 3s ease-in-out infinite;
 			}
 
 			.result-card strong {
-				color: #5946a5;
+				color: var(--accent-primary);
 				font-size: 1.2rem;
+				text-shadow: 0 0 0.6rem rgb(var(--accent-primary-rgb) / 42%);
 			}
 
 			.winner {
-				margin: 1rem 0 0;
+				margin: 1.5rem 0 0;
+				padding: 1rem;
+				border: 1px solid var(--accent-primary);
+				border-radius: 0.75rem;
+				background: linear-gradient(
+					110deg,
+					rgb(var(--accent-primary-rgb) / 18%),
+					rgb(var(--accent-secondary-rgb) / 30%)
+				);
+				color: var(--accent-primary);
+				font-family: 'Press Start 2P', system-ui, sans-serif;
+				font-size: clamp(0.7rem, 3vw, 1rem);
 				font-weight: 700;
+				line-height: 1.8;
+				overflow-wrap: anywhere;
 				text-align: center;
+				text-shadow: 0 0 0.8rem rgb(var(--accent-primary-rgb) / 45%);
+				box-shadow:
+					0 0 1rem rgb(var(--accent-primary-rgb) / 25%),
+					inset 0 0 1.5rem rgb(var(--accent-primary-rgb) / 8%);
+				animation:
+					winner-reveal 650ms cubic-bezier(0.2, 0.75, 0.25, 1) both,
+					winner-glow 1.8s ease-in-out 650ms infinite alternate;
 			}
 
-			@media (max-width: 36rem) {
-				.arena {
-					padding: 2.5rem 0;
-				}
+			.winner.is-tie {
+				border-color: var(--accent-secondary);
+				background: linear-gradient(
+					110deg,
+					rgb(var(--accent-secondary-rgb) / 30%),
+					rgb(var(--accent-primary-rgb) / 15%)
+				);
+				color: #e4c8ff;
+				text-shadow: 0 0 0.8rem rgb(var(--accent-secondary-rgb) / 75%);
+				box-shadow:
+					0 0 1rem rgb(var(--accent-secondary-rgb) / 35%),
+					inset 0 0 1.5rem rgb(var(--accent-secondary-rgb) / 10%);
+			}
 
-				.players {
-					grid-template-columns: 1fr;
-				}
-
+			@media (max-width: 1024px) {
 				.player-results {
-					grid-template-columns: 1fr;
+					grid-template-columns: minmax(0, 1fr);
 					justify-items: center;
 				}
 
 				.result-card {
 					width: 100%;
 				}
+			}
+
+			@media (max-width: 768px) {
+				.arena {
+					padding: 2.5rem 0;
+				}
+
+				.intro {
+					margin-bottom: 1.5rem;
+				}
+
+				.eyebrow {
+					font-size: 0.7rem;
+				}
+
+				h1 {
+					font-size: clamp(1.5rem, 8vw, 2.5rem);
+				}
+
+				.intro > p:last-child {
+					font-size: 0.95rem;
+				}
+
+				.players {
+					grid-template-columns: 1fr;
+				}
 
 				.battle-form,
 				.results {
 					padding: 1.15rem;
+				}
+
+				.results h2 {
+					font-size: 0.75rem;
+				}
+
+				input {
+					min-height: 2.75rem;
+					font-size: 0.95rem;
+				}
+
+				button {
+					width: 100%;
+					min-height: 2.75rem;
+					font-size: 0.6rem;
+				}
+
+				.date-range {
+					font-size: 0.75rem;
+				}
+			}
+
+			@keyframes error-shake {
+				0%,
+				100% {
+					transform: translateX(0);
+				}
+				20%,
+				60% {
+					transform: translateX(-0.4rem);
+				}
+				40%,
+				80% {
+					transform: translateX(0.4rem);
+				}
+			}
+
+			@keyframes neon-pulse {
+				from {
+					filter: brightness(0.85);
+					text-shadow:
+						0 0 0.15rem #fff,
+						0 0 0.5rem var(--accent-primary),
+						0 0 1rem rgb(var(--accent-primary-rgb) / 60%),
+						0 0 1.75rem rgb(var(--accent-secondary-rgb) / 40%);
+				}
+				to {
+					filter: brightness(1.15);
+					text-shadow:
+						0 0 0.25rem #fff,
+						0 0 0.85rem var(--accent-primary),
+						0 0 1.75rem rgb(var(--accent-primary-rgb) / 90%),
+						0 0 3rem rgb(var(--accent-secondary-rgb) / 70%);
+				}
+			}
+
+			@keyframes vs-gradient-shift {
+				0%,
+				100% {
+					background-position: 0% 50%;
+					transform: rotate(-8deg) scale(1);
+				}
+				50% {
+					background-position: 100% 50%;
+					transform: rotate(8deg) scale(1.08);
+				}
+			}
+
+			@keyframes card-shimmer {
+				0%,
+				65%,
+				100% {
+					left: -75%;
+				}
+				35% {
+					left: 130%;
+				}
+			}
+
+			@keyframes float-in {
+				from {
+					opacity: 0;
+					transform: translateY(0.75rem);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@keyframes loading-color-shift {
+				from {
+					color: var(--accent-primary);
+					text-shadow: 0 0 0.35rem rgb(var(--accent-primary-rgb) / 45%);
+				}
+				to {
+					color: var(--accent-secondary);
+					text-shadow: 0 0 0.55rem rgb(var(--accent-secondary-rgb) / 70%);
+				}
+			}
+
+			@keyframes winner-reveal {
+				from {
+					opacity: 0;
+					transform: scale(0.85) translateY(0.75rem);
+				}
+				to {
+					opacity: 1;
+					transform: scale(1) translateY(0);
+				}
+			}
+
+			@keyframes winner-glow {
+				from {
+					filter: brightness(0.9);
+				}
+				to {
+					filter: brightness(1.25);
+				}
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				*,
+				*::before,
+				*::after {
+					scroll-behavior: auto !important;
+					animation-duration: 0.01ms !important;
+					animation-iteration-count: 1 !important;
+					transition-duration: 0.01ms !important;
 				}
 			}
 		</style>
@@ -317,7 +711,10 @@
 			const form = document.querySelector<HTMLFormElement>('#battle-form');
 			const playerOneInput = document.querySelector<HTMLInputElement>('#player-one');
 			const playerTwoInput = document.querySelector<HTMLInputElement>('#player-two');
+			const playerOneError = document.querySelector<HTMLElement>('#player-one-error');
+			const playerTwoError = document.querySelector<HTMLElement>('#player-two-error');
 			const battleButton = document.querySelector<HTMLButtonElement>('#battle-button');
+			const themeToggle = document.querySelector<HTMLButtonElement>('#theme-toggle');
 			const results = document.querySelector<HTMLElement>('#results');
 			const battleStatus = document.querySelector<HTMLElement>('#battle-status');
 			const playerResults = document.querySelector<HTMLElement>('#player-results');
@@ -335,7 +732,10 @@
 				!form ||
 				!playerOneInput ||
 				!playerTwoInput ||
+				!playerOneError ||
+				!playerTwoError ||
 				!battleButton ||
+				!themeToggle ||
 				!results ||
 				!battleStatus ||
 				!playerResults ||
@@ -351,6 +751,20 @@
 			) {
 				throw new Error('Battle page is missing a required element.');
 			}
+
+			themeToggle.addEventListener('click', () => {
+				const useBlueOrange = document.documentElement.dataset.theme !== 'blue-orange';
+				if (useBlueOrange) {
+					document.documentElement.dataset.theme = 'blue-orange';
+				} else {
+					delete document.documentElement.dataset.theme;
+				}
+
+				themeToggle.setAttribute('aria-pressed', String(useBlueOrange));
+				themeToggle.textContent = useBlueOrange
+					? 'Switch to Green + Purple'
+					: 'Switch to Blue + Orange';
+			});
 
 			function isRecord(value: unknown): value is Record<string, unknown> {
 				return typeof value === 'object' && value !== null;
@@ -427,6 +841,45 @@
 				};
 			}
 
+			function validateUsername(username: string): string | null {
+				if (!username) {
+					return 'Enter a GitHub username.';
+				}
+
+				if (
+					username.length > 39 ||
+					!/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(username) ||
+					username.includes('--')
+				) {
+					return 'Use 1–39 letters, numbers, or hyphens; start and end with a letter or number, and avoid consecutive hyphens.';
+				}
+
+				return null;
+			}
+
+			function setInputError(
+				input: HTMLInputElement,
+				errorElement: HTMLElement,
+				message: string | null,
+			): void {
+				const playerInput = input.closest<HTMLElement>('.player-input');
+				if (!playerInput) {
+					throw new Error('Username input is missing its player label.');
+				}
+
+				if (message) {
+					input.setAttribute('aria-invalid', 'true');
+					playerInput.classList.add('has-error');
+					errorElement.textContent = message;
+					errorElement.hidden = false;
+				} else {
+					input.removeAttribute('aria-invalid');
+					playerInput.classList.remove('has-error');
+					errorElement.textContent = '';
+					errorElement.hidden = true;
+				}
+			}
+
 			async function fetchContributions(username: string): Promise<ContributionData> {
 				const response = await fetch(`/api/contributions/${encodeURIComponent(username)}`);
 				let data: unknown;
@@ -472,7 +925,11 @@
 						const dateLabel = date.toISOString().slice(0, 10);
 						const square = document.createElement('span');
 						square.className = 'contribution-day';
-						square.style.backgroundColor = data.colors_full[day.level];
+						square.style.setProperty('--source-color', data.colors_full[day.level]);
+						square.style.setProperty(
+							'--contribution-intensity',
+							`${data.colors_full.length > 1 ? (day.level / (data.colors_full.length - 1)) * 100 : 0}%`,
+						);
 						square.title = `${dateLabel}: ${day.count} contributions`;
 						square.setAttribute('aria-hidden', 'true');
 						graph.append(square);
@@ -480,17 +937,29 @@
 				}
 			}
 
+			for (const [input, errorElement] of [
+				[playerOneInput, playerOneError],
+				[playerTwoInput, playerTwoError],
+			]) {
+				input.addEventListener('input', () => {
+					if (input.getAttribute('aria-invalid') === 'true') {
+						setInputError(input, errorElement, validateUsername(input.value.trim()));
+					}
+				});
+			}
+
 			form.addEventListener('submit', async (event) => {
 				event.preventDefault();
 
 				const firstUsername = playerOneInput.value.trim();
 				const secondUsername = playerTwoInput.value.trim();
+				const firstError = validateUsername(firstUsername);
+				const secondError = validateUsername(secondUsername);
+				setInputError(playerOneInput, playerOneError, firstError);
+				setInputError(playerTwoInput, playerTwoError, secondError);
 
-				if (!firstUsername || !secondUsername) {
-					results.hidden = false;
-					playerResults.hidden = true;
-					battleWinner.hidden = true;
-					battleStatus.textContent = 'Enter both GitHub usernames to start a battle.';
+				if (firstError || secondError) {
+					(firstError ? playerOneInput : playerTwoInput).focus();
 					return;
 				}
 
@@ -500,6 +969,8 @@
 				results.hidden = false;
 				playerResults.hidden = true;
 				battleWinner.hidden = true;
+				battleStatus.classList.remove('is-error');
+				battleStatus.classList.add('is-loading');
 				battleStatus.textContent = 'Loading contribution data...';
 
 				try {
@@ -518,19 +989,22 @@
 					renderGraph(playerTwoGraph, secondData, secondUsername);
 					battleStatus.textContent = 'The results are in!';
 					playerResults.hidden = false;
-					battleWinner.textContent =
-						firstData.total_contributions === secondData.total_contributions
-							? "It's a tie!"
-							: `${firstData.total_contributions > secondData.total_contributions ? firstUsername : secondUsername} wins!`;
+					const isTie = firstData.total_contributions === secondData.total_contributions;
+					battleWinner.classList.toggle('is-tie', isTie);
+					battleWinner.textContent = isTie
+						? "🤝 IT'S A TIE! 🤝"
+						: `🏆 ${firstData.total_contributions > secondData.total_contributions ? firstUsername : secondUsername} WINS! 🏆`;
 					battleWinner.hidden = false;
 				} catch (error) {
 					playerResults.hidden = true;
+					battleStatus.classList.add('is-error');
 					battleStatus.textContent =
 						error instanceof Error ? error.message : 'Could not load contribution data. Please try again.';
 				} finally {
 					battleButton.disabled = false;
 					battleButton.textContent = 'Battle!';
 					form.removeAttribute('aria-busy');
+					battleStatus.classList.remove('is-loading');
 				}
 			});
 		</script>
