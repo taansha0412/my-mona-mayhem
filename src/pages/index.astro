@@ -18,7 +18,7 @@
 				<p>Pick two players and see whose contributions come out on top.</p>
 			</header>
 
-			<form id="battle-form" class="battle-form">
+			<form id="battle-form" class="battle-form" novalidate>
 				<div class="players">
 					<label class="player-input">
 						<span>Player 1</span>
@@ -53,10 +53,15 @@
 					<article class="result-card">
 						<h3 id="player-one-name"></h3>
 						<p><strong id="player-one-total"></strong> contributions</p>
+						<p id="player-one-date-range" class="date-range"></p>
+						<div id="player-one-graph" class="contribution-graph" role="img"></div>
 					</article>
+					<p class="vs-badge" aria-label="versus">VS</p>
 					<article class="result-card">
 						<h3 id="player-two-name"></h3>
 						<p><strong id="player-two-total"></strong> contributions</p>
+						<p id="player-two-date-range" class="date-range"></p>
+						<div id="player-two-graph" class="contribution-graph" role="img"></div>
 					</article>
 				</div>
 				<p id="battle-winner" class="winner" hidden></p>
@@ -126,11 +131,18 @@
 				box-shadow: 0 0.75rem 2rem rgb(37 33 58 / 6%);
 			}
 
-			.players,
-			.player-results {
+			.players {
 				display: grid;
 				grid-template-columns: repeat(2, minmax(0, 1fr));
 				gap: 1rem;
+			}
+
+			.player-results {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+				align-items: center;
+				gap: 1rem;
+				margin-top: 1rem;
 			}
 
 			.player-input {
@@ -191,11 +203,8 @@
 				color: #5f5b70;
 			}
 
-			.player-results {
-				margin-top: 1rem;
-			}
-
 			.result-card {
+				min-width: 0;
 				padding: 1rem;
 				border-radius: 0.75rem;
 				background: #f4f1ff;
@@ -209,6 +218,44 @@
 
 			.result-card p {
 				margin-bottom: 0;
+			}
+
+			.date-range {
+				margin-top: 0.4rem;
+				color: #5f5b70;
+				font-size: 0.8rem;
+			}
+
+			.contribution-graph {
+				display: grid;
+				grid-auto-flow: column;
+				grid-auto-columns: 0.65rem;
+				grid-template-rows: repeat(7, 0.65rem);
+				gap: 0.2rem;
+				width: 100%;
+				min-width: 0;
+				margin-top: 1rem;
+				overflow-x: auto;
+				padding-bottom: 0.25rem;
+			}
+
+			.contribution-day {
+				width: 0.65rem;
+				height: 0.65rem;
+				border-radius: 2px;
+			}
+
+			.vs-badge {
+				display: grid;
+				width: 2.75rem;
+				height: 2.75rem;
+				margin: 0;
+				place-items: center;
+				border-radius: 50%;
+				background: #5946a5;
+				color: #fff;
+				font-size: 0.85rem;
+				font-weight: 800;
 			}
 
 			.result-card strong {
@@ -227,9 +274,17 @@
 					padding: 2.5rem 0;
 				}
 
-				.players,
+				.players {
+					grid-template-columns: 1fr;
+				}
+
 				.player-results {
 					grid-template-columns: 1fr;
+					justify-items: center;
+				}
+
+				.result-card {
+					width: 100%;
 				}
 
 				.battle-form,
@@ -240,9 +295,24 @@
 		</style>
 
 		<script>
-			type ContributionData = {
+			interface ContributionDay {
+				weekday: number;
+				count: number;
+				level: number;
+			}
+
+			interface ContributionWeek {
+				first_day: string;
+				contribution_days: ContributionDay[];
+			}
+
+			interface ContributionData {
 				total_contributions: number;
-			};
+				from: string;
+				to: string;
+				colors_full: string[];
+				weeks: ContributionWeek[];
+			}
 
 			const form = document.querySelector<HTMLFormElement>('#battle-form');
 			const playerOneInput = document.querySelector<HTMLInputElement>('#player-one');
@@ -255,6 +325,10 @@
 			const playerTwoName = document.querySelector<HTMLElement>('#player-two-name');
 			const playerOneTotal = document.querySelector<HTMLElement>('#player-one-total');
 			const playerTwoTotal = document.querySelector<HTMLElement>('#player-two-total');
+			const playerOneDateRange = document.querySelector<HTMLElement>('#player-one-date-range');
+			const playerTwoDateRange = document.querySelector<HTMLElement>('#player-two-date-range');
+			const playerOneGraph = document.querySelector<HTMLElement>('#player-one-graph');
+			const playerTwoGraph = document.querySelector<HTMLElement>('#player-two-graph');
 			const battleWinner = document.querySelector<HTMLElement>('#battle-winner');
 
 			if (
@@ -269,40 +343,141 @@
 				!playerTwoName ||
 				!playerOneTotal ||
 				!playerTwoTotal ||
+				!playerOneDateRange ||
+				!playerTwoDateRange ||
+				!playerOneGraph ||
+				!playerTwoGraph ||
 				!battleWinner
 			) {
 				throw new Error('Battle page is missing a required element.');
 			}
 
+			function isRecord(value: unknown): value is Record<string, unknown> {
+				return typeof value === 'object' && value !== null;
+			}
+
+			function isIsoDate(value: unknown): value is string {
+				if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+					return false;
+				}
+
+				const date = new Date(`${value}T00:00:00Z`);
+				return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+			}
+
+			function parseContributionData(data: unknown, username: string): ContributionData {
+				if (
+					!isRecord(data) ||
+					typeof data.total_contributions !== 'number' ||
+					!Number.isInteger(data.total_contributions) ||
+					data.total_contributions < 0 ||
+					!isIsoDate(data.from) ||
+					!isIsoDate(data.to) ||
+					!Array.isArray(data.colors_full) ||
+					data.colors_full.length === 0 ||
+					!data.colors_full.every(
+						(color) => typeof color === 'string' && /^#[\da-f]{6}$/i.test(color),
+					) ||
+					!Array.isArray(data.weeks)
+				) {
+					throw new Error(`Contribution data for ${username} was not in the expected format.`);
+				}
+
+				const weeks: ContributionWeek[] = data.weeks.map((week) => {
+					if (
+						!isRecord(week) ||
+						!isIsoDate(week.first_day) ||
+						!Array.isArray(week.contribution_days) ||
+						week.contribution_days.length !== 7
+					) {
+						throw new Error(`Contribution data for ${username} was not in the expected format.`);
+					}
+
+					const contributionDays: ContributionDay[] = week.contribution_days.map((day, index) => {
+						if (
+							!isRecord(day) ||
+							day.weekday !== index ||
+							typeof day.count !== 'number' ||
+							!Number.isInteger(day.count) ||
+							day.count < 0 ||
+							typeof day.level !== 'number' ||
+							!Number.isInteger(day.level) ||
+							day.level < 0 ||
+							day.level >= data.colors_full.length
+						) {
+							throw new Error(`Contribution data for ${username} was not in the expected format.`);
+						}
+
+						return {
+							weekday: day.weekday,
+							count: day.count,
+							level: day.level,
+						};
+					});
+
+					return { first_day: week.first_day, contribution_days: contributionDays };
+				});
+
+				return {
+					total_contributions: data.total_contributions,
+					from: data.from,
+					to: data.to,
+					colors_full: data.colors_full,
+					weeks,
+				};
+			}
+
 			async function fetchContributions(username: string): Promise<ContributionData> {
 				const response = await fetch(`/api/contributions/${encodeURIComponent(username)}`);
-				const data: unknown = await response.json();
+				let data: unknown;
+				try {
+					data = await response.json();
+				} catch {
+					throw new Error(`Could not read contribution data for ${username}.`);
+				}
 
 				if (!response.ok) {
 					const message =
-						typeof data === 'object' &&
-						data !== null &&
-						'error' in data &&
-						typeof data.error === 'object' &&
-						data.error !== null &&
-						'message' in data.error &&
+						isRecord(data) &&
+						isRecord(data.error) &&
 						typeof data.error.message === 'string'
 							? data.error.message
 							: `Could not load contributions for ${username}.`;
 					throw new Error(message);
 				}
 
-				if (
-					typeof data !== 'object' ||
-					data === null ||
-					!('total_contributions' in data) ||
-					typeof data.total_contributions !== 'number' ||
-					!Number.isFinite(data.total_contributions)
-				) {
-					throw new Error(`Contribution data for ${username} was not in the expected format.`);
-				}
+				return parseContributionData(data, username);
+			}
 
-				return { total_contributions: data.total_contributions };
+			function formatDate(date: string): string {
+				return new Intl.DateTimeFormat(undefined, {
+					day: 'numeric',
+					month: 'short',
+					timeZone: 'UTC',
+					year: 'numeric',
+				}).format(new Date(`${date}T00:00:00Z`));
+			}
+
+			function renderGraph(graph: HTMLElement, data: ContributionData, username: string): void {
+				graph.replaceChildren();
+				graph.setAttribute(
+					'aria-label',
+					`${username} contributions from ${formatDate(data.from)} to ${formatDate(data.to)}`,
+				);
+
+				for (const week of data.weeks) {
+					for (const day of week.contribution_days) {
+						const date = new Date(`${week.first_day}T00:00:00Z`);
+						date.setUTCDate(date.getUTCDate() + day.weekday);
+						const dateLabel = date.toISOString().slice(0, 10);
+						const square = document.createElement('span');
+						square.className = 'contribution-day';
+						square.style.backgroundColor = data.colors_full[day.level];
+						square.title = `${dateLabel}: ${day.count} contributions`;
+						square.setAttribute('aria-hidden', 'true');
+						graph.append(square);
+					}
+				}
 			}
 
 			form.addEventListener('submit', async (event) => {
@@ -312,8 +487,10 @@
 				const secondUsername = playerTwoInput.value.trim();
 
 				if (!firstUsername || !secondUsername) {
-					battleStatus.textContent = 'Enter both GitHub usernames to start a battle.';
 					results.hidden = false;
+					playerResults.hidden = true;
+					battleWinner.hidden = true;
+					battleStatus.textContent = 'Enter both GitHub usernames to start a battle.';
 					return;
 				}
 
@@ -335,6 +512,10 @@
 					playerTwoName.textContent = secondUsername;
 					playerOneTotal.textContent = firstData.total_contributions.toLocaleString();
 					playerTwoTotal.textContent = secondData.total_contributions.toLocaleString();
+					playerOneDateRange.textContent = `${formatDate(firstData.from)} – ${formatDate(firstData.to)}`;
+					playerTwoDateRange.textContent = `${formatDate(secondData.from)} – ${formatDate(secondData.to)}`;
+					renderGraph(playerOneGraph, firstData, firstUsername);
+					renderGraph(playerTwoGraph, secondData, secondUsername);
 					battleStatus.textContent = 'The results are in!';
 					playerResults.hidden = false;
 					battleWinner.textContent =
@@ -343,6 +524,7 @@
 							: `${firstData.total_contributions > secondData.total_contributions ? firstUsername : secondUsername} wins!`;
 					battleWinner.hidden = false;
 				} catch (error) {
+					playerResults.hidden = true;
 					battleStatus.textContent =
 						error instanceof Error ? error.message : 'Could not load contribution data. Please try again.';
 				} finally {
